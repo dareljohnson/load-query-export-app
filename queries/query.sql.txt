@@ -1,0 +1,9 @@
+-- Managerial Span of Control Analysis:
+-- Calculating the number of direct reports for each manager
+SELECT 
+    m.id AS manager_id, 
+    m.first_name || ' ' || m.last_name AS manager_name, 
+    COUNT(e.id) AS direct_reports_count
+FROM managers m
+LEFT JOIN employees e ON m.id = e.manager_id
+GROUP BY m.id, m.first_name, m.last_name;
