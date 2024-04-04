@@ -26,7 +26,7 @@ You can also use a modern code editor like VSCode to follow along with this cour
 
 ## How to Use the Project
 
-You can clone this project and skip the step-by-step instructions to develop from scratch.
+You can clone this project.
 
 ```
  git clone https://github.com/dareljohnson/load-query-export-app
@@ -48,6 +48,7 @@ Optional:
 - numpy v1.26.4
 - DB Browser for SQLite v3.12.2 (https://sqlitebrowser.org/dl/)
 - Anaconda (https://www.anaconda.com/download)
+
 
 
 ## Step-by-step instructions
@@ -83,9 +84,11 @@ For example, copy the following csv files employess.csv and managers.csv to the 
 
 ![](docs/Data_Files.PNG)
 
+
 Copy your prepared SQL statements (code) into the query.sql.txt file:
 
 ![](docs/Prepared_SQL.PNG)
+
 
 Open DB Browser for SQLite:
 
@@ -95,13 +98,16 @@ Create New Database
 
 ![](docs/DB_Browser_1.PNG)
 
+
 Name your SQLite database file and save it to the root of the project directory:
 
 ![](docs/DB_Browser_2.PNG)
 
+
 New database is created with empty Tables:
 
 ![](docs/DB_Browser_3.PNG)
+
 
 
 ## How to Run the Project
@@ -111,7 +117,7 @@ Open up a Terminal window:
 ![](docs/Terminal_1.PNG)
 
 
-Chane directory to the local application:
+Change directory to the local application:
 
 ```
 cd load-query-export-app
@@ -123,21 +129,26 @@ Close the database in DB Browser for SQLite application.
 
 ![](docs/DB_Browser_4.PNG)
 
+
 Run the application:
 
 ![](docs/Terminal_2.PNG)
+
 
 This will create a new results.xlsx file in the results directory.
 
 ![](docs/Result_File.PNG)
 
+
 Open DB Browser for SQLite and Open the database file:
 
 ![](docs/DB_Browser_5.PNG)
 
+
 You can execute the same SQL query in the query.sql.txt or any other queries.
 
 ![](docs/DB_Browser_6.PNG)
+
 
 
 ## Include Credits
