@@ -153,7 +153,8 @@ You can execute the same SQL query in the query.sql.txt or any other queries.
 
 ## Include Credits
 
-N/A
+csv files were originally created with TableConvert (https://tableconvert.com/)
+
 
 ## Contributing
 
@@ -161,6 +162,7 @@ Pull requests are welcome. For major changes, please open an issue first
 to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
+
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
