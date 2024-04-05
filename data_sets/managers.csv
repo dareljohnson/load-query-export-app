@@ -1,4 +1,4 @@
-﻿id,first_name,last_name,email
-1,Margorie,Black,mblack@msn.com
-2,Janet,Harley,jharley@aol.com
-3,Mike,Doford,mdoford@gmail.com
+﻿id,first_name,last_name,email,start_date,promotion_date
+1,Margorie,Black,mblack@msn.com,2008-05-01,2013-09-11
+2,Janet,Harley,jharley@aol.com,2018-11-25,2022-04-11
+3,Mike,Doford,mdoford@gmail.com,2001-06-19

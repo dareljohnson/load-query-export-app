@@ -1,9 +1,36 @@
--- Managerial Span of Control Analysis:
--- Calculating the number of direct reports for each manager
-SELECT 
-    m.id AS manager_id, 
-    m.first_name || ' ' || m.last_name AS manager_name, 
-    COUNT(e.id) AS direct_reports_count
-FROM managers m
-LEFT JOIN employees e ON m.id = e.manager_id
-GROUP BY m.id, m.first_name, m.last_name;
+WITH EmployeeManagerTenure AS (
+  SELECT
+    e.id AS employee_id,
+    e.first_name AS employee_first_name,
+    e.last_name AS employee_last_name,
+    e.start_date AS employee_start_date,
+    CAST((julianday(date('now')) - julianday(e.start_date)) / 365 AS INTEGER) AS employee_tenure_years,
+    m.id AS manager_id,
+    m.first_name AS manager_first_name,
+    m.last_name AS manager_last_name,
+    m.start_date AS manager_start_date,
+    CAST((julianday(date('now')) - julianday(m.start_date)) / 365 AS INTEGER) AS manager_tenure_years
+  FROM employees AS e
+  LEFT JOIN employees AS m ON e.manager_id = m.id -- Assuming managers are also in the employees table
+)
+SELECT
+  employee_id,
+  employee_first_name,
+  employee_last_name,
+  employee_tenure_years,
+  CASE
+    WHEN employee_tenure_years < 2 THEN 'Newbie'
+    WHEN employee_tenure_years BETWEEN 2 AND 5 THEN 'Experienced'
+    ELSE 'Veteran'
+  END AS employee_tenure_category,
+  manager_id,
+  manager_first_name,
+  manager_last_name,
+  manager_tenure_years,
+  CASE
+    WHEN manager_tenure_years < 2 THEN 'Newbie'
+    WHEN manager_tenure_years BETWEEN 2 AND 5 THEN 'Experienced'
+    ELSE 'Veteran'
+  END AS manager_tenure_category
+FROM EmployeeManagerTenure
+ORDER BY employee_tenure_years DESC, manager_tenure_years DESC;

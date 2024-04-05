@@ -19,6 +19,8 @@ def main(data_files, sql, db, output_file):
     if len(data_files) > 0:
         for file in data_files:
             load_file_into_db(file, conn)
+    else:
+        raise ValueError("Invalid or empty data_files specified.")
 
     # Execute SQL from the provided text file and load results
     if sql is not None:
@@ -37,6 +39,12 @@ def main(data_files, sql, db, output_file):
                     print("DataFrame is empty. No data written to Excel.")
             except Exception as e:
                 print(f"Failed to write DataFrame to Excel: {e}")
+
+        else:
+            raise ValueError("Invalid or empty output_file specified.")
+
+    else:
+        raise ValueError("Invalid or empty sql specified.")
 
     # Close the database connection
     conn.close()

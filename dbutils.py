@@ -81,26 +81,31 @@ def execute_sql_from_file(sql_file, conn):
     with open(sql_file, 'r') as file:
         sql_content = file.read()
 
-    # Split the SQL content by ';' assuming multiple statements might be separated by ';'
-    sql_commands = [command.strip() for command in sql_content.split(';') if command.strip()]
+    # Use the chunksize parameter
+    chunk_size = 100  # Adjust based on your memory constraints and dataset
 
-    # Initialize an empty DataFrame to hold any results
-    results_df = pd.DataFrame()
+    # Debugging print to check each command
+    print(f"Executing SQL command: {sql_content[:450]}...")  # Print first 450 characters to avoid clutter
 
-    # Execute each SQL command
-    for command in sql_commands:
-        # Debugging print to check each command
-        print(f"Executing SQL command: {command[:450]}...")  # Print first 450 characters to avoid clutter
-        trimmed_command = command.strip()
-        if trimmed_command:  # Avoid executing empty commands
-            try:
-                temp_df = pd.read_sql_query(trimmed_command, conn)
-                results_df = pd.concat([results_df, temp_df], ignore_index=True)
+    try:
+        # Use the generator to accumulate chunks into a list
+        chunks = list(fetch_chunks(sql_content, conn, chunk_size))
 
-            except DatabaseError as exc:
-                raise ValueError(f"Execution failed on sql '{trimmed_command}': {exc}")
+        # Concatenate the list of DataFrames into a single DataFrame
+        results_df = pd.concat(chunks, ignore_index=True) if chunks else pd.DataFrame()
+
+        print(results_df.head())
+
+    except DatabaseError as exc:
+        raise ValueError(f"Execution failed on sql '{sql_content}': {exc}")
 
     return results_df
+
+
+# Generator function to yield chunks of data
+def fetch_chunks(query, connection, chunk_size):
+    for chunk in pd.read_sql_query(query, connection, chunksize=chunk_size):
+        yield chunk
 
 
 # Function to extract table name from path
