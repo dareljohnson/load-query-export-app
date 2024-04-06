@@ -1,36 +1,58 @@
-WITH EmployeeManagerTenure AS (
+WITH CorrectedDates AS (
   SELECT
-    e.id AS employee_id,
-    e.first_name AS employee_first_name,
-    e.last_name AS employee_last_name,
-    e.start_date AS employee_start_date,
-    CAST((julianday(date('now')) - julianday(e.start_date)) / 365 AS INTEGER) AS employee_tenure_years,
-    m.id AS manager_id,
-    m.first_name AS manager_first_name,
-    m.last_name AS manager_last_name,
-    m.start_date AS manager_start_date,
-    CAST((julianday(date('now')) - julianday(m.start_date)) / 365 AS INTEGER) AS manager_tenure_years
-  FROM employees AS e
-  LEFT JOIN employees AS m ON e.manager_id = m.id -- Assuming managers are also in the employees table
+    id,
+    first_name,
+    last_name,
+    -- Attempt to correct and format start_date
+    CASE
+      WHEN length(replace(start_date, '-', '/')) >= 8 THEN -- Basic length check after standardizing separators
+        substr('0000' || substr(replace(start_date, '-', '/'), -4), -4) || '-' || -- Year
+        substr('00' || substr(replace(start_date, '-', '/'), 1, instr(replace(start_date, '-', '/'), '/') - 1), -2) || '-' || -- Month
+        substr('00' || substr(replace(start_date, '-', '/'), instr(replace(start_date, '-', '/'), '/') + 1, instr(substr(replace(start_date, '-', '/'), instr(replace(start_date, '-', '/'), '/') + 1), '/') - 1), -2) -- Day
+      ELSE 'Invalid Date'
+    END AS corrected_start_date,
+    -- Similar logic for promotion_date with handling for NULL values
+    CASE
+      WHEN promotion_date IS NOT NULL AND length(replace(promotion_date, '-', '/')) >= 8 THEN
+        substr('0000' || substr(replace(promotion_date, '-', '/'), -4), -4) || '-' ||
+        substr('00' || substr(replace(promotion_date, '-', '/'), 1, instr(replace(promotion_date, '-', '/'), '/') - 1), -2) || '-' ||
+        substr('00' || substr(replace(promotion_date, '-', '/'), instr(replace(promotion_date, '-', '/'), '/') + 1, instr(substr(replace(promotion_date, '-', '/'), instr(replace(promotion_date, '-', '/'), '/') + 1), '/') - 1), -2)
+      ELSE NULL
+    END AS corrected_promotion_date
+  FROM employees
+),
+EmployeeTenure AS (
+  SELECT
+    id,
+    first_name,
+    last_name,
+    corrected_start_date,
+    corrected_promotion_date,
+    CAST((julianday(date('now')) - julianday(corrected_start_date)) / 365 AS INTEGER) AS tenure_years,
+    CASE
+      WHEN corrected_promotion_date IS NOT NULL THEN
+        CAST((julianday(date('now')) - julianday(corrected_promotion_date)) / 365 AS INTEGER)
+      ELSE
+        0
+    END AS years_since_last_promotion
+  FROM CorrectedDates
 )
 SELECT
-  employee_id,
-  employee_first_name,
-  employee_last_name,
-  employee_tenure_years,
+  id,
+  first_name,
+  last_name,
+  tenure_years,
+  years_since_last_promotion,
   CASE
-    WHEN employee_tenure_years < 2 THEN 'Newbie'
-    WHEN employee_tenure_years BETWEEN 2 AND 5 THEN 'Experienced'
+    WHEN tenure_years < 2 THEN 'Newbie'
+    WHEN tenure_years BETWEEN 2 AND 5 THEN 'Experienced'
     ELSE 'Veteran'
-  END AS employee_tenure_category,
-  manager_id,
-  manager_first_name,
-  manager_last_name,
-  manager_tenure_years,
+  END AS tenure_category,
   CASE
-    WHEN manager_tenure_years < 2 THEN 'Newbie'
-    WHEN manager_tenure_years BETWEEN 2 AND 5 THEN 'Experienced'
-    ELSE 'Veteran'
-  END AS manager_tenure_category
-FROM EmployeeManagerTenure
-ORDER BY employee_tenure_years DESC, manager_tenure_years DESC;
+    WHEN years_since_last_promotion IS NULL THEN 'Never Promoted'
+    WHEN years_since_last_promotion < 2 THEN 'Recently Promoted'
+    WHEN years_since_last_promotion BETWEEN 2 AND 5 THEN 'Due for Promotion'
+    ELSE 'Long Time Since Last Promotion'
+  END AS promotion_status
+FROM EmployeeTenure
+ORDER BY tenure_years DESC;
