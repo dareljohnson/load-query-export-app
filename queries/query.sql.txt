@@ -49,7 +49,7 @@ SELECT
     ELSE 'Veteran'
   END AS tenure_category,
   CASE
-    WHEN years_since_last_promotion IS NULL THEN 'Never Promoted'
+    WHEN years_since_last_promotion IS 0 THEN 'Never Promoted'
     WHEN years_since_last_promotion < 2 THEN 'Recently Promoted'
     WHEN years_since_last_promotion BETWEEN 2 AND 5 THEN 'Due for Promotion'
     ELSE 'Long Time Since Last Promotion'
